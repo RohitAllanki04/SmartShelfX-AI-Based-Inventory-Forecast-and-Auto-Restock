@@ -1,12 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import animationData from "../assets/login-animation.json";
 
 const SignIn = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(""); // state for success
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage(""); // reset previous success
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid email or password");
+      }
+
+      const data = await response.json();
+
+      // Save JWT token locally
+      localStorage.setItem("token", data.token);
+
+      // Show inline success message
+      setSuccessMessage("Login successful! Redirecting...");
+
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      {/* Container */}
       <div className="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden w-[750px] max-w-full">
         
         {/* LEFT SIDE – Animation */}
@@ -27,52 +71,50 @@ const SignIn = () => {
             Log in
           </h1>
 
-          {/* Google OAuth Button */}
-          <button className="flex items-center justify-center border border-gray-300 rounded-lg py-2 mb-3 hover:bg-gray-200 transition-all bg-white">
-            <img
-              src="https://www.svgrepo.com/show/355037/google.svg"
-              alt="Google"
-              className="w-4 h-4 mr-2"
-            />
-            <span className="text-sm font-medium text-gray-700">
-              Continue with Google
-            </span>
-          </button>
-
-          <div className="flex items-center mb-3">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-gray-500 text-xs px-2">or login with email</span>
-            <div className="flex-1 h-px bg-gray-300"></div>
-          </div>
-
-          {/* Login Form */}
-          <form>
-            <div className="mb-3">
-              <input
-                type="email"
-                placeholder="Email Id"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
+          {/* Display error or success messages */}
+          {error && (
+            <div className="bg-red-100 text-red-600 text-sm p-2 rounded mb-3 text-center">
+              {error}
             </div>
+          )}
 
-            <div className="mb-3">
-              <input
-                type="password"
-                placeholder="Enter Your Password"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
-              <div className="text-right mt-1">
-                <a href="#" className="text-xs text-gray-500 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
+          {successMessage && (
+            <div className="bg-green-100 text-green-600 text-sm p-2 rounded mb-3 text-center">
+              {successMessage}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+            <input
+              type="email"
+              placeholder="Email Id"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 mb-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Enter Your Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 mb-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              required
+            />
+
+            <div className="text-right mb-3">
+              <a href="#" className="text-xs text-gray-500 hover:underline">
+                Forgot password?
+              </a>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-gray-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition-all mb-3"
+              disabled={loading}
+              className="w-full bg-gray-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition-all disabled:opacity-60 mb-3"
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 

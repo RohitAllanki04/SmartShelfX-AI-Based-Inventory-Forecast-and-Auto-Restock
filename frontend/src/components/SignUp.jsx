@@ -1,14 +1,72 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import animationData from "../assets/login-animation.json";
+import { signup } from "../utils/api";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    companyName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "",
+    contactNumber: "",
+    warehouseLocation: "",
+  });
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(""); // <-- New state for success
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage(""); // reset success message
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await signup({
+        fullName: formData.fullName,
+        companyName: formData.companyName,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        role: formData.role,
+        contactNumber: formData.contactNumber,
+        warehouseLocation: formData.warehouseLocation,
+      });
+
+      setSuccessMessage("Account created successfully! Redirecting...");
+
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+
+    } catch (err) {
+      setError(err.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden w-[750px] max-w-full">
-
         {/* LEFT SIDE – Animation */}
         <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-5">
           <motion.div
@@ -23,102 +81,116 @@ const SignUp = () => {
 
         {/* RIGHT SIDE – Sign Up Form */}
         <div className="w-full md:w-1/2 bg-gray-100 p-8 flex flex-col justify-center">
-
           <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
             Sign Up
           </h1>
 
-          <form className="space-y-3">
-            {/* Full Name */}
-            <div>
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
+          {error && (
+            <div className="bg-red-100 text-red-600 text-sm p-2 rounded mb-3 text-center">
+              {error}
             </div>
+          )}
 
-            {/* Company Name */}
-            <div>
-              <input
-                type="text"
-                placeholder="Company Name"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
+          {successMessage && (
+            <div className="bg-green-100 text-green-600 text-sm p-2 rounded mb-3 text-center">
+              {successMessage}
             </div>
+          )}
 
-            {/* Official Email ID */}
-            <div>
-              <input
-                type="email"
-                placeholder="Official Email ID"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Inputs here */}
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
+            <input
+              type="text"
+              name="companyName"
+              placeholder="Company Name"
+              value={formData.companyName}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Official Email ID"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            >
+              <option value="" disabled>
+                Select Role
+              </option>
+              <option value="ADMIN">Admin</option>
+              <option value="STORE_MANAGER">Store Manager</option>
+            </select>
+            <input
+              type="tel"
+              name="contactNumber"
+              placeholder="Contact Number"
+              value={formData.contactNumber}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
+            <input
+              type="text"
+              name="warehouseLocation"
+              placeholder="Warehouse Location"
+              value={formData.warehouseLocation}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+            />
 
-            {/* Password */}
-            <div>
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
-            </div>
-
-            {/* Role Selection */}
-            <div>
-              <select
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select Role
-                </option>
-                <option value="admin">Admin</option>
-                <option value="store-manager">Store Manager</option>
-              </select>
-            </div>
-
-            {/* Contact Number */}
-            <div>
-              <input
-                type="tel"
-                placeholder="Contact Number"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
-            </div>
-
-            {/* Warehouse Location */}
-            <div>
-              <input
-                type="text"
-                placeholder="Warehouse Location"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
-              />
-            </div>
-
-            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-gray-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 transition-all"
+              disabled={loading}
+              className="w-full bg-gray-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 transition-all disabled:opacity-60"
             >
-              Sign Up
+              {loading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
 
-          {/* Login Link */}
           <p className="text-center text-xs text-gray-600 mt-3">
             Already have an account?{" "}
-            <Link to="/SignIn" className="text-gray-500 font-medium hover:underline">
+            <Link
+              to="/signin"
+              className="text-gray-500 font-medium hover:underline"
+            >
               Log in
             </Link>
           </p>
