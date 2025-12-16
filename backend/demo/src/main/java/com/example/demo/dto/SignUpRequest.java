@@ -23,7 +23,7 @@ public class SignUpRequest {
     private String confirmPassword;
 
     @NotBlank(message = "Role is required")
-    private String role; // ADMIN or STORE_MANAGER
+    private String role; // ADMIN or STORE_MANAGER or USER
 
     private String contactNumber;
     private String warehouseLocation;

@@ -1,9 +1,8 @@
 package com.example.demo.service;
-
+import com.example.demo.model.User.Role;
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.dto.SignInRequest;
 import com.example.demo.dto.SignUpRequest;
-import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.Repo.UserRepo;
 import com.example.demo.Security.JwtUtil;
@@ -31,21 +30,16 @@ public class UserServiceImpl implements UserService {
         User user = repository.findByEmail(req.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        // 2️⃣ Ensure user is not OAuth-only
-        if (user.isUsingOauth()) {
-            throw new RuntimeException("Use OAuth to login for this account");
-        }
-
-        // 3️⃣ Verify password
+        // 2️⃣ Verify password
         if (!encoder.matches(req.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        // 4️⃣ Generate JWT token (pass Role enum, not string)
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        // 3️⃣ Generate JWT token (correct order: id, email, role)
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole());
 
-        // 5️⃣ Return token + role as string
-        return new AuthResponse(token, user.getRole());
+        // 4️⃣ Return token + id + role
+        return new AuthResponse(token, user.getRole(),user.getId());
     }
 
     @Override
@@ -61,7 +55,21 @@ public class UserServiceImpl implements UserService {
         }
 
         // 3️⃣ Map role string to Role enum
-        Role role = "ADMIN".equalsIgnoreCase(req.getRole()) ? Role.ADMIN : Role.STORE_MANAGER;
+        Role role;
+        switch (req.getRole().toUpperCase()) {
+            case "ADMIN":
+                role = Role.ADMIN;
+                break;
+            case "STORE_MANAGER":
+                role = Role.STORE_MANAGER;
+                break;
+            case "USER":
+                role = Role.USER;
+                break;
+            default:
+                role = Role.USER; // fallback if you added a new role
+                break;
+        }
 
         // 4️⃣ Create and save user
         User user = User.builder()
@@ -77,11 +85,11 @@ public class UserServiceImpl implements UserService {
 
         repository.save(user);
 
-        // 5️⃣ Generate JWT token
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        // 5️⃣ Generate JWT token with ID included
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole());
 
-        // 6️⃣ Return token + role as string
-        return new AuthResponse(token, user.getRole());
+        // 6️⃣ Return token + id + role
+        return new AuthResponse(token, user.getRole(), user.getId());
     }
 
     @Override

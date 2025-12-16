@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import animationData from "../assets/login-animation.json";
+import { saveToken, getProfileFromToken, saveProfile } from "../utils/auth";
+import { API_BASE_URL } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,30 +21,43 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/signin", {
+      const base = (API_BASE_URL || '').replace(/\/$/, '');
+      const response = await fetch(`${base}/api/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+       body: JSON.stringify({ email, password }),
       });
-
+   
+       
       if (!response.ok) {
         throw new Error("Invalid email or password");
       }
 
       const data = await response.json();
 
-      // Save JWT token locally
-      localStorage.setItem("token", data.token);
+  // Save JWT token locally (central helper)
+  saveToken(data.token);
+
+  // Decode profile from JWT and save for easy retrieval across the app
+  const profile = getProfileFromToken(data.token);
+  if (profile) saveProfile(profile);
 
       // Show inline success message
       setSuccessMessage("Login successful! Redirecting...");
 
-      // Redirect to dashboard after a short delay
+      // Determine destination based on role in token
+      const role = profile && profile.role ? String(profile.role).toLowerCase() : '';
+      let dest = '/dashboard';
+      if (role.includes('admin')) dest = '/admindashboard';
+      else if (role.includes('user')) dest = '/userdashboard';
+      else if (role.includes('storemanager') || role.includes('store_manager') || role.includes('store-manager')) dest = '/dashboard';
+
+      // Navigate after a short delay so the success message is visible
       setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1500);
+        navigate(dest, { replace: true });
+      }, 600);
 
     } catch (err) {
       setError(err.message);
@@ -90,7 +107,7 @@ const SignIn = () => {
               placeholder="Email Id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 mb-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 mb-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
               required
             />
 
@@ -99,11 +116,11 @@ const SignIn = () => {
               placeholder="Enter Your Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mb-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 mb-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
               required
             />
 
-            <div className="text-right mb-3">
+            <div className="text-right mb-2">
               <a href="#" className="text-xs text-gray-500 hover:underline">
                 Forgot password?
               </a>
@@ -112,15 +129,15 @@ const SignIn = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition-all disabled:opacity-60 mb-3"
+              className="w-full bg-gray-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition-all disabled:opacity-60 mb-2"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
-          <p className="text-center text-xs text-gray-600 mt-2">
+          <p className="text-center text-xs text-gray-600 mt-1">
             Don't have an account?{" "}
-            <a href="/SignUp" className="text-gray-500 font-medium hover:underline">
+            <a href="/signup" className="text-gray-500 font-medium hover:underline">
               Sign up
             </a>
           </p>

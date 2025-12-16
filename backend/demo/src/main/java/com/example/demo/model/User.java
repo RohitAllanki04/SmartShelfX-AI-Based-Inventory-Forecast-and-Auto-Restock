@@ -38,4 +38,11 @@ public class User {
     @Column
     private boolean usingOauth; // true if created via Google OAuth
 
+    public enum Role {
+        ADMIN,
+        STORE_MANAGER,
+        USER
+    }
+
+
 }

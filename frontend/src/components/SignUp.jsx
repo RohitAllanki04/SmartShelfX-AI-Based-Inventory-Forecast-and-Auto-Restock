@@ -65,10 +65,10 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden w-[750px] max-w-full">
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="flex flex-col md:flex-row bg-white shadow rounded-lg overflow-hidden w-[750px] max-w-full">
         {/* LEFT SIDE – Animation */}
-        <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-5">
+  <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-5">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ const SignUp = () => {
         </div>
 
         {/* RIGHT SIDE – Sign Up Form */}
-        <div className="w-full md:w-1/2 bg-gray-100 p-8 flex flex-col justify-center">
+  <div className="w-full md:w-1/2 bg-white p-8 flex flex-col justify-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
             Sign Up
           </h1>
@@ -97,7 +97,7 @@ const SignUp = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-2">
             {/* Inputs here */}
             <input
               type="text"
@@ -106,7 +106,7 @@ const SignUp = () => {
               value={formData.fullName}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
             <input
               type="text"
@@ -115,7 +115,7 @@ const SignUp = () => {
               value={formData.companyName}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
             <input
               type="email"
@@ -124,7 +124,7 @@ const SignUp = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
             <input
               type="password"
@@ -133,7 +133,7 @@ const SignUp = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
             <input
               type="password"
@@ -142,20 +142,21 @@ const SignUp = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             >
               <option value="" disabled>
                 Select Role
               </option>
               <option value="ADMIN">Admin</option>
               <option value="STORE_MANAGER">Store Manager</option>
+              <option value="USER">User</option>
             </select>
             <input
               type="tel"
@@ -164,7 +165,7 @@ const SignUp = () => {
               value={formData.contactNumber}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
             <input
               type="text"
@@ -173,25 +174,25 @@ const SignUp = () => {
               value={formData.warehouseLocation}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white hover:border-gray-400 transition input-compact"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 transition-all disabled:opacity-60"
+              className="w-full bg-white text-gray-800 py-2 rounded-lg text-sm font-semibold border border-gray-300 hover:bg-gray-50 transition-all disabled:opacity-60"
             >
               {loading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
 
-          <p className="text-center text-xs text-gray-600 mt-3">
+          <p className="text-center text-xs text-gray-600 mt-2">
             Already have an account?{" "}
             <Link
               to="/signin"
               className="text-gray-500 font-medium hover:underline"
             >
-              Log in
+              Sign in
             </Link>
           </p>
         </div>

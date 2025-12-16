@@ -1,32 +1,75 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LandingPage from "./components/LandingPage";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
-import Navbar from "./components/Navbar";
+import AuthLayout from "./components/AuthLayout";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
-import Transactions from "./pages/Transactions";
-import RestockOrders from "./pages/RestockOrders";
+import TransactionOrderList from "./pages/TransactionOrderList";
+import TransactionOrderForm from "./pages/TransactionOrderForm";
 import Suppliers from "./pages/Suppliers";
 import Profile from "./pages/Profile";
+import Admindashboard from "./pages/Admindashboard";
+import Userdashboard from "./pages/UserDashboardClean";
+import DemandForecast from "./pages/DemandForecast";
+import Analytics from "./pages/Analytics";
+import Cart from "./pages/Cart";
+import Purchases from "./pages/Purchases";
+import PurchaseOrderForm from "./pages/PurchaseOrderForm";
+import RealtimeDemo from "./pages/RealtimeDemo";
+import Notification from "./components/Notification";
+import ConfirmDialog from "./components/ConfirmDialog";
+
 function App() {
   return (
     <Router>
-      <Navbar />
-      <main className="p-6">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/SignIn" element={<SignIn />} />
-          <Route path="/SignUp" element={<SignUp />} />
+      <Notification />
+      <ConfirmDialog />
+      <Routes>
+        {/* Public routes - Redirect root to signin */}
+        <Route path="/" element={<Navigate to="/signin" replace />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+
+        {/* Protected routes - require authentication */}
+        <Route element={<AuthLayout />}>
+          {/* Manager/Admin Dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admindashboard" element={<Admindashboard />} />
+          
+          {/* User Dashboard */}
+          <Route path="/userdashboard" element={<Userdashboard />} />
+          
+          {/* Inventory Management */}
           <Route path="/products" element={<Products />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/restock-orders" element={<RestockOrders />} />
+          
+          {/* Stock Transactions (moved into other pages) */}
+          
+          {/* AI Demand Forecasting */}
+          <Route path="/forecast" element={<DemandForecast />} />
+          
+          {/* Transaction Orders (stock transactions) */}
+          <Route path="/transactions" element={<TransactionOrderList />} />
+          <Route path="/transactions/create" element={<TransactionOrderForm />} />
+          <Route path="/transactions/edit/:id" element={<TransactionOrderForm />} />
+          
+          {/* Vendor/Supplier Management */}
           <Route path="/suppliers" element={<Suppliers />} />
+          
+          {/* Analytics & Reports */}
+          <Route path="/analytics" element={<Analytics />} />
+          {/* Cart */}
+          <Route path="/cart" element={<Cart />} />
+          {/* Purchases / Purchase Orders */}
+          <Route path="/purchases" element={<Purchases />} />
+          <Route path="/purchases/new" element={<PurchaseOrderForm />} />
+          <Route path="/purchases/edit/:id" element={<PurchaseOrderForm />} />
+          <Route path="/realtime-demo" element={<RealtimeDemo />} />
+          
+          {/* User Profile */}
           <Route path="/profile" element={<Profile />} />
-        </Routes>
-      </main>
+        </Route>
+      </Routes>
     </Router>
   );
 }

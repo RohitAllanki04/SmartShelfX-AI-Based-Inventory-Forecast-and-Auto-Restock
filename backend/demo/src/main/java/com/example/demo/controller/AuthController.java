@@ -28,4 +28,5 @@ public class AuthController {
         var resp = service.signIn(req);
         return ResponseEntity.ok(resp);
     }
+
 }
